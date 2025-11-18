@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PDF Chat AI — Modern RAG</title>
+
+  <!-- Puter SDK -->
+  <script src="https://js.puter.com/v2/"></script>
+
+  <!-- PDF.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+  </script>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div class="app">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h1>PDF Chat</h1>
+        <button id="dark-toggle" class="dark-toggle" title="Toggle dark mode" aria-label="Toggle dark mode">
+          <input type="checkbox" class="toggle-checkbox" aria-hidden="true" />
+          <label class="toggle-label">
+            <span class="toggle-inner"></span>
+            <span class="toggle-switch">
+              <svg class="toggle-icon light-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+              </svg>
+              <svg class="toggle-icon dark-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+              </svg>
+            </span>
+          </label>
+        </button>
+      </div>
+
+      <!-- UPLOADER -->
+      <div class="uploader" id="dropzone">
+        <input id="pdfs" type="file" accept="application/pdf" multiple hidden aria-label="Select PDF files" />
+        <div class="uploader-content">
+          <div class="upload-icon" aria-hidden="true">📄</div>
+          <button id="upload-btn" class="btn-outline" type="button">Choose PDFs</button>
+          <div id="uploader-info" class="uploader-info">No files selected</div>
+        </div>
+      </div>
+
+      <button id="process-btn" class="btn-primary" type="button">Process PDFs</button>
+      <div id="status" class="status"></div>
+
+      <!-- FILES SECTION -->
+      <div class="section-title">Files</div>
+      <div id="file-list" class="file-list" role="list"></div>
+
+      <!-- LOGS SECTION -->
+      <div class="section-title">Logs</div>
+      <div id="debug-log" class="debug-log" role="log"></div>
+    </aside>
+
+    <!-- MAIN CHAT AREA -->
+    <main class="chat-panel">
+      <div class="main-split">
+        <!-- Chat Box -->
+        <div id="chat-box" class="chat-box" role="log" aria-live="polite" aria-label="Chat messages"></div>
+
+        <!-- Right Panel Container -->
+        <div class="right-panel">
+          <!-- Summaries -->
+          <div class="chunk-viewer">
+            <h3>Summaries</h3>
+            <div id="summary-list" class="top-chunks" role="list"></div>
+          </div>
+
+          <!-- Top Chunks -->
+          <div class="chunk-viewer">
+            <h3>Top Chunks</h3>
+            <div id="top-chunks" class="top-chunks" role="list">
+              <div class="hint">Ask a question...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Input Area -->
+      <div class="input-wrapper">
+        <div class="input-area">
+          <input id="question" type="text" placeholder="Ask about your PDFs..." aria-label="Question input" />
+          <button id="send-btn" class="send-button" type="button" title="Send message (Enter)" aria-label="Send message">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- CHUNK PREVIEW MODAL -->
+  <div id="chunk-preview" class="modal" aria-hidden="true" role="dialog" aria-labelledby="preview-title">
+    <div class="modal-content">
+      <button id="close-preview" class="close-btn" type="button" aria-label="Close preview">✕</button>
+      <h3 id="preview-title">Chunk Preview</h3>
+      <div id="preview-body" class="preview-body"></div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- TYPING INDICATOR TEMPLATE -->
+  <template id="typing-template">
+    <div class="typing" aria-label="AI is typing"><span></span><span></span><span></span></div>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>
